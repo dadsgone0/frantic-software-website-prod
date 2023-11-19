@@ -1,0 +1,26 @@
+name: CI/CD Pipeline (Prod)
+
+on:
+  pull_request:
+    types: [ closed ]
+
+jobs:
+  deploy_to_production:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy to GCE staging
+        uses: cross-the-world/ssh-pipeline@v1.2.0
+        with:
+    # ssh remote host
+          host: ${{ secrets.GCE_IP }}
+    # ssh remote user
+          user: ${{ secrets.GCE_USER }}
+    # content of ssh private key. ex raw content of ~/.ssh/id_rsa
+          key: ${{ secrets.PRIVATE_KEY }}
+    # execute commands on ssh
+          script: |
+            sudo ./script.sh
